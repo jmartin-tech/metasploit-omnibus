@@ -15,6 +15,7 @@ end
 
 exclude "**/.git"
 exclude "**/bundler/git"
+exclude "**/devkit"
 
 project_location_dir = name
 package :msi do
