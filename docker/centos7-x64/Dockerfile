@@ -1,17 +1,15 @@
 # To build the dev environment.
 # docker build -t rapid7/msf-centos6-x64-omnibus .
-FROM centos:centos6
+FROM centos:centos7
 MAINTAINER Rapid7 Release Engineering <r7_re@rapid7.com>
 
 VOLUME /pkg
-
-RUN rpm -ivh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 RUN yum upgrade -y && yum clean all
-RUN yum install -y centos-release-SCL && yum clean all
+RUN yum install -y centos-release-scl && yum clean all
 RUN rpm --import http://mirrors.neterra.net/repoforge/RPM-GPG-KEY.dag.txt
-RUN curl -O http://mirrors.neterra.net/repoforge/redhat/el6/en/x86_64/rpmforge/RPMS/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm && \
-    rpm -i rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm && \
-    rm rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+RUN curl -O http://mirrors.neterra.net/repoforge/redhat/el7/en/x86_64/rpmforge/RPMS/rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm && \
+    rpm -i rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm && \
+    rm rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm
 
 RUN yum --enablerepo=rpmforge-extras install -y \
     autoconf \
@@ -37,6 +35,7 @@ RUN yum --enablerepo=rpmforge-extras install -y \
     rpm-build \
     fakeroot \
     git \
+    which \
     ccache \
     createrepo \
     expect \
@@ -76,7 +75,7 @@ RUN su jenkins -c 'command curl -sSL https://rvm.io/mpapis.asc | gpg --import - 
 
 RUN su jenkins -c "/bin/bash -l -c 'rvm requirements'"
 RUN su jenkins -c "/bin/bash -l -c 'rvm install 2.6.5'"
-RUN su jenkins -c "/bin/bash -l -c 'gem install bundler -v 1.17.3 --no-document'"
+RUN su jenkins -c "/bin/bash -l -c 'gem install bundler -v 2.1.4 --no-document'"
 # pre-load the omnibus dependencies
 RUN su jenkins -c "/bin/bash -l -c 'cd ~/ && git clone https://github.com/rapid7/metasploit-omnibus.git && \
         cd ~/metasploit-omnibus && bundle install --binstubs && cd ~/ && rm -fr metasploit-omnibus'"
