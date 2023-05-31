@@ -46,8 +46,8 @@ RUN su jenkins -c 'command curl --insecure -sSL https://rvm.io/mpapis.asc | gpg 
   curl --insecure -L -sSL https://get.rvm.io | bash -s stable'
 
 RUN su jenkins -c "/bin/bash -l -c 'rvm requirements'"
-RUN su jenkins -c "linux32 /bin/bash -l -c 'rvm install 2.6.5'"
-RUN su jenkins -c "linux32 /bin/bash -l -c 'gem install bundler -v 2.1.4 --no-document'"
+RUN su jenkins -c "linux32 /bin/bash -l -c 'rvm install 3.0.5'"
+RUN su jenkins -c "linux32 /bin/bash -l -c 'gem install bundler -v 2.2.34 --no-document'"
 
 # pre-load the omnibus dependencies
 RUN su jenkins -c "/bin/bash -l -c 'cd ~/ && git clone https://github.com/rapid7/metasploit-omnibus.git && \

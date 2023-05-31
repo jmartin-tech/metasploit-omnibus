@@ -63,7 +63,7 @@ RUN curl -O https://www.sqlite.org/src/tarball/sqlite.tar.gz?r=release && \
   cd ../ && rm -rf sqlite* && rm -rf bld
 
 # pre-load the omnibus dependencies
-RUN su jenkins -c "/bin/bash -l -c 'rvm install 2.6.5 --autolibs=0'"
-RUN su jenkins -c "/bin/bash -l -c 'rvm use 2.6.5 && gem install bundler -v 1.17.3 --no-document'"
-RUN su jenkins -c "/bin/bash -l -c 'rvm use 2.6.5 && cd ~/ && git clone https://github.com/rapid7/metasploit-omnibus.git && \
+RUN su jenkins -c "/bin/bash -l -c 'rvm install 3.0.5 --autolibs=0'"
+RUN su jenkins -c "/bin/bash -l -c 'rvm use 3.0.5 && gem install bundler -v 2.2.34 --no-document'"
+RUN su jenkins -c "/bin/bash -l -c 'rvm use 3.0.5 && cd ~/ && git clone https://github.com/rapid7/metasploit-omnibus.git && \
   cd metasploit-omnibus && bundle install --binstubs && cd .. && rm -rf metasploit-omnibus'"
