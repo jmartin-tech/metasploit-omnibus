@@ -1,0 +1,171 @@
+name: Verify
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+permissions:
+  actions: none
+  checks: none
+  contents: none
+  deployments: none
+  id-token: none
+  issues: none
+  discussions: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
+  statuses: none
+
+on:
+  push:
+    branches-ignore:
+      - gh-pages
+      - weekly-dependency-updates
+  pull_request:
+    branches-ignore:
+      - weekly-dependency-updates
+
+jobs:
+  deb32:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    name: deb32 - ./bin/omnibus build metasploit-framework
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: deb32 build
+        run: |
+          IMG="rapid7/msf-ubuntu1204-x86-omnibus:2021_11"
+          docker pull $IMG 
+          docker run --rm=true --tty -u jenkins \
+            --volume=`pwd`:/metasploit-omnibus \
+            --workdir=/metasploit-omnibus $IMG linux32 \
+            bash -l -c "gem install bundler -v 2.2.3 && bundle install --binstubs && ./bin/omnibus build metasploit-framework"
+
+      - name: Capture installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: deb-i386
+          path: pkg/*.deb
+          retention-days: 90
+
+  deb64:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    name: deb64 - ./bin/omnibus build metasploit-framework
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: deb64 build
+        run: |
+          IMG="rapid7/msf-kali109-x64-omnibus:2020_03"
+          mkdir certs
+          curl -L -o ./certs/ca-certificates.crt https://curl.haxx.se/ca/cacert.pem
+          docker pull $IMG 
+          docker run --rm=true --tty -u jenkins \
+            --volume=`pwd`:/metasploit-omnibus \
+            --volume=`pwd`/certs:/etc/ssl/certs \
+            --workdir=/metasploit-omnibus $IMG \
+            bash -l -c "export SSL_CERT_FILE=/metasploit-omnibus/certs/ca-certificates.crt; \
+              gem install bundler -v 2.2.3 && \
+              bundle install --binstubs && \
+              ./bin/omnibus build metasploit-framework"
+
+      - name: Capture installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: deb-x64
+          path: pkg/*.deb
+          retention-days: 90
+
+  rpm64:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    name: rpm64 - ./bin/omnibus build metasploit-framework
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: rpm64 build
+        run: |
+          IMG="rapid7/msf-centos6-x64-omnibus:2020_03"
+          docker pull $IMG 
+          docker run --rm=true --tty -u jenkins \
+            --volume=`pwd`:/metasploit-omnibus \
+            --workdir=/metasploit-omnibus $IMG \
+            bash -l -c "gem install bundler -v 2.2.3 && bundle install --binstubs && ./bin/omnibus build metasploit-framework"
+
+      - name: Capture installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: rpm-x64
+          path: pkg/*.rpm
+          retention-days: 90
+          
+  macOSx64:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: true
+      matrix:
+        ruby:
+          - '2.6'
+        os:
+          - macos-11
+#          - macos-13-arm64
+        test_cmd:
+          - ./bin/omnibus build metasploit-framework
+
+    env:
+      RAILS_ENV: test
+
+    name: ${{ matrix.os }} - ${{ matrix.test_cmd }}
+    steps:
+      - name: Prepare Env
+        run: |
+          export BUILD_USER=$USER
+          sudo mkdir -p /opt/metasploit-framework
+          sudo mkdir -p /var/cache/omnibus
+          sudo chown $BUILD_USER /opt/metasploit-framework
+          sudo chown $BUILD_USER /var/cache/omnibus
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Setup Ruby
+        env:
+          BUNDLE_WITHOUT: "coverage development pcap"
+          # Nokogiri doesn't release pre-compiled binaries for preview versions of Ruby; So force compilation with BUNDLE_FORCE_RUBY_PLATFORM
+          BUNDLE_FORCE_RUBY_PLATFORM: "${{ contains(matrix.ruby, 'preview') && 'true' || 'false' }}"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '${{ matrix.ruby }}'
+          bundler-cache: true
+
+      - name: Export binstubs
+        run: bundle install --binstubs
+
+      - name: ${{ matrix.test_cmd }}
+        run: |
+          echo "${CMD}"
+          bash -c "${CMD}"
+        env:
+          CMD: ${{ matrix.test_cmd }}
+
+      - name: Capture installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: macOS-x64
+          path: pkg/*.pkg
+          retention-days: 90
