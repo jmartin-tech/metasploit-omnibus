@@ -121,12 +121,8 @@ jobs:
           - '2.6'
         os:
           - macos-11
-#          - macos-13-arm64
         test_cmd:
           - ./bin/omnibus build metasploit-framework
-
-    env:
-      RAILS_ENV: test
 
     name: ${{ matrix.os }} - ${{ matrix.test_cmd }}
     steps:
@@ -168,4 +164,57 @@ jobs:
         with:
           name: macOS-x64
           path: pkg/*.pkg
+          retention-days: 90
+
+  windowsx64:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: true
+      matrix:
+        ruby:
+          - '2.6'
+        os:
+          - windows-2019
+        test_cmd:
+          - bundle exec ./bin/omnibus build metasploit-framework
+
+    name: ${{ matrix.os }} - ${{ matrix.test_cmd }}
+    steps:
+      - name: Prepare Env
+        run: |
+          mkdir C:/metasploit-framework
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Setup Ruby
+        env:
+          BUNDLE_WITHOUT: "coverage development pcap"
+          # Nokogiri doesn't release pre-compiled binaries for preview versions of Ruby; So force compilation with BUNDLE_FORCE_RUBY_PLATFORM
+          BUNDLE_FORCE_RUBY_PLATFORM: "${{ contains(matrix.ruby, 'preview') && 'true' || 'false' }}"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '${{ matrix.ruby }}'
+          bundler-cache: true
+
+      - name: Extract xz files
+        run: xz -d local/cache/*.xz
+
+      - name: Export binstubs
+        run: bundle install --binstubs
+
+      - name: ${{ matrix.test_cmd }}
+        run: | 
+          ls
+          ${{ matrix.test_cmd }}
+
+      - name: Capture installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-x64
+          path: pkg/*.msi
           retention-days: 90
