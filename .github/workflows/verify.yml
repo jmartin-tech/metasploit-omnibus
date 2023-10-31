@@ -209,7 +209,7 @@ jobs:
 
       - name: ${{ matrix.test_cmd }}
         run: | 
-          ls
+          ls bin
           ${{ matrix.test_cmd }}
 
       - name: Capture installer
