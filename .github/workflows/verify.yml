@@ -178,7 +178,7 @@ jobs:
         os:
           - windows-2019
         test_cmd:
-          - bundle exec ./bin/omnibus build metasploit-framework
+          - make 
 
     name: ${{ matrix.os }} - ${{ matrix.test_cmd }}
     steps:
