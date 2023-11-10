@@ -7,7 +7,7 @@ all:
 	bundle binstubs --all
 
 	# build the metasploit-framework package
-	bundle exec bin/omnibus build metasploit-framework
+	ruby bin/omnibus build metasploit-framework
 
 .PHONY: clean
 clean:
