@@ -199,10 +199,6 @@ jobs:
           path: local/cache/git_cache/metasploit-framework
 
       - name: Setup Ruby
-        env:
-          BUNDLE_WITHOUT: "coverage development pcap"
-          # Nokogiri doesn't release pre-compiled binaries for preview versions of Ruby; So force compilation with BUNDLE_FORCE_RUBY_PLATFORM
-          BUNDLE_FORCE_RUBY_PLATFORM: "${{ contains(matrix.ruby, 'preview') && 'true' || 'false' }}"
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '${{ matrix.ruby }}'
