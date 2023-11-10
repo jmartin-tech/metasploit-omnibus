@@ -3,8 +3,9 @@
 .PHONY: all
 all:
 	# install omnibus' dependencies
-	bundle install
-	bundle binstubs --all
+	bundle _2.2.33_ install
+	bundle _2.2.33_ binstubs --all
+	git diff
 
 	# build the metasploit-framework package
 	ruby bin/omnibus build metasploit-framework
