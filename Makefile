@@ -3,7 +3,8 @@
 .PHONY: all
 all:
 	# install omnibus' dependencies
-	rm Gemfile.lock
+	bundle config set --local deployment false
+	bundle config set --local path 'vendor/bundle'
 	bundle _2.2.33_ install
 	bundle _2.2.33_ binstubs --all
 	git diff
