@@ -218,6 +218,7 @@ jobs:
       - name: ${{ matrix.test_cmd }}
         run: | 
           ls bin
+          gem install win32-process -v 0.9.0
           ${{ matrix.test_cmd }}
 
       - name: Capture installer
