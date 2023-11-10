@@ -3,6 +3,7 @@
 .PHONY: all
 all:
 	# install omnibus' dependencies
+	rm Gemfile.lock
 	bundle _2.2.33_ install
 	bundle _2.2.33_ binstubs --all
 	git diff
