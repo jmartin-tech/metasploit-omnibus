@@ -182,14 +182,21 @@ jobs:
 
     name: ${{ matrix.os }} - ${{ matrix.test_cmd }}
     steps:
-      - name: Prepare Env
-        run: |
-          mkdir C:/metasploit-framework
-
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           submodules: true
+
+      - name: Prepare Env
+        run: |
+          mkdir C:/metasploit-framework
+          mkdir -p ./local/cache/git_cache
+
+      - name: Check Framework repo
+        uses: actions/checkout@master
+        with:
+          repository: rapid7/metasploit-framework
+          path: local/cache/git_cache/metasploit-framework
 
       - name: Setup Ruby
         env:
