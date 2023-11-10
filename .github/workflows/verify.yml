@@ -196,7 +196,7 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: rapid7/metasploit-framework
-          path: local/cache/git_cache/metasploit-framework
+          path: local/cache/metasploit-framework
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
