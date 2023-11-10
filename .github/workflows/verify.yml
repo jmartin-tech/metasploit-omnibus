@@ -207,6 +207,7 @@ jobs:
         with:
           ruby-version: '${{ matrix.ruby }}'
           bundler-cache: true
+          bundler: 2.2.33
 
       - name: Extract xz files
         run: xz -d local/cache/*.xz
