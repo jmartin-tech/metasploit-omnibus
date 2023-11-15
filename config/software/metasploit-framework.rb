@@ -2,6 +2,9 @@ name "metasploit-framework"
 if linux? && File.exist?("/metasploit-framework")
   # supply current version of metasploit-framework at root of filesystem
   source path: "/metasploit-framework"
+elsif windows? && File.exist?("#{project.files_path}/../local/cache/metasploit-framework")
+  # added to allow automation builds to use a prefetched repo
+  source path: "#{project.files_path}/../local/cache/metasploit-framework"
 else
   source git: "https://github.com/rapid7/metasploit-framework.git"
   default_version "master"
