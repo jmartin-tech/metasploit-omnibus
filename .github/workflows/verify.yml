@@ -190,13 +190,6 @@ jobs:
       - name: Prepare Env
         run: |
           mkdir C:/metasploit-framework
-          mkdir -p ./local/cache/git_cache
-
-      - name: Check Framework repo
-        uses: actions/checkout@master
-        with:
-          repository: rapid7/metasploit-framework
-          path: local/cache/metasploit-framework
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -208,12 +201,9 @@ jobs:
       - name: Extract xz files
         run: xz -d local/cache/*.xz
 
-      - name: Export binstubs
-        run: bundle install --binstubs
-
       - name: ${{ matrix.test_cmd }}
         run: | 
-          ls bin
+          ls local/cache
           ${{ matrix.test_cmd }}
 
       - name: Capture installer
