@@ -43,7 +43,7 @@ jobs:
           docker run --rm=true --tty -u jenkins \
             --volume=`pwd`:/metasploit-omnibus \
             --workdir=/metasploit-omnibus $IMG linux32 \
-            bash -l -c "gem install bundler -v 2.2.3 && bundle install --binstubs && ./bin/omnibus build metasploit-framework"
+            bash -l -c "rvm install 2.7.8; cd .; gem install bundler -v 2.2.3 && bundle install --binstubs && ./bin/omnibus build metasploit-framework"
 
       - name: Capture installer
         uses: actions/upload-artifact@v3
@@ -73,6 +73,7 @@ jobs:
             --volume=`pwd`/certs:/etc/ssl/certs \
             --workdir=/metasploit-omnibus $IMG \
             bash -l -c "export SSL_CERT_FILE=/metasploit-omnibus/certs/ca-certificates.crt; \
+              rvm install 2.7.8; cd .; \
               gem install bundler -v 2.2.3 && \
               bundle install --binstubs && \
               ./bin/omnibus build metasploit-framework"
@@ -101,7 +102,7 @@ jobs:
           docker run --rm=true --tty -u jenkins \
             --volume=`pwd`:/metasploit-omnibus \
             --workdir=/metasploit-omnibus $IMG \
-            bash -l -c "gem install bundler -v 2.2.3 && bundle install --binstubs && ./bin/omnibus build metasploit-framework"
+            bash -l -c "rvm install 2.7.8; cd .; gem install bundler -v 2.2.3 && bundle install --binstubs && ./bin/omnibus build metasploit-framework"
 
       - name: Capture installer
         uses: actions/upload-artifact@v3
@@ -118,7 +119,7 @@ jobs:
       fail-fast: true
       matrix:
         ruby:
-          - '2.6'
+          - '2.7'
         os:
           - macos-11
         test_cmd:
@@ -174,7 +175,7 @@ jobs:
       fail-fast: true
       matrix:
         ruby:
-          - '2.6'
+          - '2.7'
         os:
           - windows-2019
         test_cmd:
